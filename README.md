@@ -36,5 +36,5 @@ mips-mini-db/
 │
 ├── README.md
 │
-├── main.asm              # Fluxo principal do programa
+├── miniDB.asm              # Fluxo principal do programa
 ~~~
