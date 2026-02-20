@@ -9,11 +9,11 @@ O foco do trabalho está na compreensão do funcionamento de baixo nível do com
 - manipulação da pilha
 - controle explícito do fluxo de execução
 
-## 🎯 Objetivo do Projeto
+## Objetivo do Projeto
 - Implementar um mini banco de dados em memória, capaz de manipular registros simples, explorando diretamente os mecanismos fundamentais da arquitetura MIPS.  
 - Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura subjacente.
 
-## 🧱 Estrutura de um Registro
+## Estrutura de um Registro
 
 Cada registro é composto por:
 ~~~
@@ -23,7 +23,7 @@ ATIVO    -> byte (1 = ativo, 0 = inativo)
 ~~~
 Os registros são organizados por meio de *arrays* paralelos, onde o índice funciona como vínculo lógico entre os campos.
 
-## 🗂 Organização do Repositório
+## Organização do Repositório
 ~~~
 mips-mini-db/
 │
