@@ -15,12 +15,15 @@ Todo o controle é feito manualmente, sem abstrações de alto nível, reforçan
 
 ## Estrutura de um Registro
 
-Cada registro é composto por:
-~~~
-ID       -> inteiro (word)
-ATIVO    -> byte (1 = ativo, 0 = inativo)
-++
-~~~
+| Offset | Campo | Tipo | Tamanho | 
+| :---: | :---: | :---: | :---:|
+| 0 | ID | word | 4 bytes | 
+| 4 | IDADE | word | 4 bytes |
+| 8 | MATRÍCULA | word | 4 bytes | 
+| 16 | ATIVO | word | 4 bytes |
+
+**Tamanho do Registro = 16 bytes**
+
 Os registros são organizados por meio de *arrays* paralelos, onde o índice funciona como vínculo lógico entre os campos.
 
 ## Organização do Repositório
