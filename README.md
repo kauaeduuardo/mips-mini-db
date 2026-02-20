@@ -39,3 +39,7 @@ mips-mini-db/
 
 - **Matheus Santos de Jesus**  
   GitHub: https://github.com/Littlemonster22
+
+## Docente 
+- Andre Luis Meneses Silva  
+GitHub: https://github.com/andrelumesi
