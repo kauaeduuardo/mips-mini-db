@@ -10,8 +10,8 @@ O foco do trabalho está na compreensão do funcionamento de baixo nível do com
 - controle explícito do fluxo de execução
 
 ## Objetivo do Projeto
-- Implementar um mini banco de dados em memória, capaz de manipular registros simples, explorando diretamente os mecanismos fundamentais da arquitetura MIPS.  
-- Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura subjacente.
+Implementar um mini banco de dados em memória, capaz de manipular registros simples, explorando diretamente os mecanismos fundamentais da arquitetura MIPS.
+Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura subjacente.
 
 ## Estrutura de um Registro
 
