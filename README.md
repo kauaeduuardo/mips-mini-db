@@ -30,9 +30,13 @@ Os registros são organizados por meio de *arrays* paralelos, onde o índice fun
 ~~~
 mips-mini-db/
 │
-├── README.md
-│
-├── miniDB.asm              # Fluxo principal do programa
+├── src/
+│   ├── main.asm
+│   ├── menu.asm
+│   ├── db.asm
+│   └── utils.asm
+│ 
+└── README.md
 ~~~
 
 ## Discentes responsáveis
