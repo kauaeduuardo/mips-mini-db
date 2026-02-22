@@ -27,12 +27,15 @@
 
 .text
 .globl main
+
+# ===== Inicialização =====
 main:
     la $s0, BANCO	# base do banco
     lw $s1, QTD_REGISTROS	# QTD_REGISTROS = 0
     lw $s2, MAX_REGISTROS	# MAX_REGISTROS = 100
     lw $s3, TAM_REGISTRO # TAM_REGISTRO
-    
+   
+# ===== Menu ===== 
 loop_menu:
     # Exibir menu
     li $v0, 4
@@ -72,6 +75,7 @@ chamar_remocao:
     jal remover_registro
     j loop_menu
 
+# ===== Inserção =====
 inserir:
     addi $sp, $sp, -4
     sw $ra, 0($sp)
@@ -115,7 +119,8 @@ ler_dados:
     move $a2, $v0
 
     jr $ra
-    
+
+# ===== Listagem =====
 listar:
     li $t0, 0
     loop_listar:
@@ -174,6 +179,7 @@ banco_cheio:
 	
 	j loop_menu
 
+# ===== Busca =====
 buscar_registro:
     li $v0, 4
     la $a0, msg_busca_id
@@ -260,6 +266,72 @@ buscar_registro:
     busca_fim:
         jr $ra    # Retorna para chamar_busca
 
+# ===== Remoção =====
+remover_registro:
+    # Pedir ID para remoção
+    li $v0, 4
+    la $a0, msg_remover_id
+    syscall
+    
+    # Ler ID
+    li $v0, 5
+    syscall
+    move $t0, $v0        # $t0 = ID a remover
+    
+    # Carregar quantidade de registros
+    move $t1, $s1     # $t1 = número total de registros
+    
+    # Se não há registros
+    beq $t1, $zero, remover_nao_encontrado
+    
+    li $t2, 0            # $t2 = índice atual (contador)
+    
+    # Carregar endereço base
+    move $t3, $s0   # $t3 = endereço base
+    
+    remover_loop:
+        # Calcular offset: índice * 16
+        mul $t4, $t2, $s3     # $t4 = offset
+        add $t5, $t3, $t4     # $t5 = endereço do registro atual
+        
+        # Verificar ID
+        lw $t6, 0($t5)        # carrega ID
+        beq $t6, $t0, remover_encontrado  # se ID igual, encontrou
+        
+    remover_proximo:
+        addi $t2, $t2, 1      # incrementa contador
+        blt $t2, $t1, remover_loop  # se contador < qtd_registros, continua
+        j remover_nao_encontrado  # se terminou o loop sem encontrar
+    
+    remover_encontrado:
+        # Verificar se já está inativo
+        lw $t6, 12($t5)       # carrega ATIVO
+        beq $t6, 0, remover_ja_inativo
+        
+        # Marcar como inativo (ATIVO = 0)
+        sw $zero, 12($t5)
+        
+        # Mensagem de sucesso
+        li $v0, 4
+        la $a0, msg_remover_sucesso
+        syscall
+        j remover_fim
+    
+    remover_ja_inativo:
+        li $v0, 4
+        la $a0, msg_remover_ja_inativo
+        syscall
+        j remover_fim
+    
+    remover_nao_encontrado:
+        li $v0, 4
+        la $a0, msg_remover_nao_encontrado
+        syscall
+    
+    remover_fim:
+        jr $ra    # Retorna para chamar_remocao
+
+# ===== Encerramento =====
 sair:
     li $v0, 10  
     syscall
