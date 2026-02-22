@@ -31,6 +31,7 @@ Os registros são organizados por meio de *arrays* paralelos, onde o índice fun
 /mips-mini-db/
 │
 ├── README.md
+├── Mars4_5.jar
 ├── src/
 │   └── miniDB.asm
 │
