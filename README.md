@@ -24,8 +24,6 @@ Todo o controle é feito manualmente, sem abstrações de alto nível, reforçan
 
 **Tamanho do Registro = 16 bytes**
 
-Os registros são organizados por meio de *arrays* paralelos, onde o índice funciona como vínculo lógico entre os campos.
-
 ## Organização do Repositório
 ~~~
 /mips-mini-db/
