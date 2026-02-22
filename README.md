@@ -28,16 +28,17 @@ Os registros são organizados por meio de *arrays* paralelos, onde o índice fun
 
 ## Organização do Repositório
 ~~~
-mips-mini-db/
+/mips-mini-db/
 │
+├── README.md
 ├── src/
-│   ├── main.asm
-│   ├── menu.asm
-│   ├── db.asm
-│   └── utils.asm
+│   └── miniDB.asm
 │
-├── Mars4_5.jar
-└── README.md
+├── docs/
+│   └── formato_registro.txt
+│
+└── exemplos/
+    └── backup_exemplo.txt
 ~~~
 
 ## Discentes responsáveis
