@@ -24,20 +24,20 @@ Todo o controle é feito manualmente, sem abstrações de alto nível, reforçan
 
 **Tamanho do Registro = 16 bytes**
 
-Os registros são organizados por meio de *arrays* paralelos, onde o índice funciona como vínculo lógico entre os campos.
-
 ## Organização do Repositório
 ~~~
-mips-mini-db/
+/mips-mini-db/
 │
-├── src/
-│   ├── main.asm
-│   ├── menu.asm
-│   ├── db.asm
-│   └── utils.asm
-│
+├── README.md
 ├── Mars4_5.jar
-└── README.md
+├── src/
+│   └── miniDB.asm
+│
+├── docs/
+│   └── formato_registro.txt
+│
+└── exemplos/
+    └── backup_exemplo.txt
 ~~~
 
 ## Discentes responsáveis
