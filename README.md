@@ -33,11 +33,9 @@ Todo o controle é feito manualmente, sem abstrações de alto nível, reforçan
 ├── src/
 │   └── miniDB.asm
 │
-├── docs/
-│   └── formato_registro.txt
+├── formato_registro.txt
 │
-└── exemplos/
-    └── backup_exemplo.txt
+└── backup_exemplo.txt
 ~~~
 
 ## Discentes responsáveis
