@@ -6,7 +6,7 @@
     TAM_REGISTRO: .word 16
     QTD_REGISTROS: .word 0
     
-    # # ===== Banco de Registros =====
+    # ===== Banco de Registros =====
     .align 2
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
     
