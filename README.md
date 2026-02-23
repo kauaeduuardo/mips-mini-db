@@ -38,6 +38,33 @@ Todo o controle é feito manualmente, sem abstrações de alto nível, reforçan
 └── backup_exemplo.txt
 ~~~
 
+## Como Executar o Programa
+Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:
+utilizando o simulador **MARS** ou via **linha de comando** (terminal).
+
+### 1. Execução pelo MARS
+1. Abra o simulador **Mars**
+2. No menu, clique em **File → Open** e selecione o arquivo principal do projeto:
+   ~~~
+   src/miniDB.asm
+   ~~~
+3. Clique em **Assemble**
+4. Após a montagem sem erros, clique em **Run**.
+
+### 2. Execução pelo Terminal
+Esta alternativa é recomendada quando se deseja evitar limitações da interface gráfica ou automatizar testes.
+**Pré-requisitos**
+- Java instalado
+- Arquivo `Mars4_5.jar` disponível no projeto ou no sistema
+
+**Comando de execução**
+1. No diretório raiz do projeto, execute:
+   ~~~
+   java -jar Mars4_5.jar sm src/miniDB.asm
+   ~~~
+
+
+
 ## Discentes responsáveis
 
 - **Kauã Eduardo Andrade de Lima**  
