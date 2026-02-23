@@ -28,7 +28,7 @@
     msg_remover_ja_inativo: .asciiz "Registro já está inativo.\n"
     
     # ===== Persistência =====
-    arquivo_nome: .asciiz "banco.txt"
+    arquivo_nome: .asciiz "banco_de_registros.txt"
     buffer:       .space 64
     espaco:       .asciiz " "
     newline:      .asciiz "\n"
