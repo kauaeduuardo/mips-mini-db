@@ -34,9 +34,11 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 ├── src/
 │   └── miniDB.asm
 │
-├── formato_registro.txt
+├── uteis/
+│   └── formato_registro.txt
 │
-└── backup_exemplo.txt
+├── backup-banco/
+    └── banco_de_registrps.txt
 ~~~
 
 - `miniDB.asm`: arquivo principal do projeto
