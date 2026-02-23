@@ -29,16 +29,17 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 ~~~
 /mips-mini-db/
 │
-├── README.md
-├── Mars4_5.jar
+├── backup-banco/
+│   └── banco_de_registros.txt
+│
 ├── src/
 │   └── miniDB.asm
 │
 ├── uteis/
 │   └── formato_registro.txt
 │
-├── backup-banco/
-    └── banco_de_registrps.txt
+├── Mars4_5.jar
+└── README.md
 ~~~
 
 - `miniDB.asm`: arquivo principal do projeto
