@@ -44,7 +44,7 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 
 - `miniDB.asm`: arquivo principal do projeto
 - `formato_registro.txt`: especificação do formato de persistência dos registros em arquivo texto
-- `backup_exemplo.txt`: exemplo de arquivo gerado para persistência dos dados
+- `banco_de_registros.txt`: exemplo de arquivo gerado para persistência dos dados
 
 ## Como Executar o Programa
 Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:
