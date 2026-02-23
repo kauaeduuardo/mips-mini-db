@@ -1,0 +1,13 @@
+Formato do arquivo de persistência:
+
+Cada linha do arquivo representa um registro ativo do banco de dados.
+Os campos são separados por um espaço simples (' '), na seguinte ordem:
+
+<ID> <IDADE> <MATRÍCULA>\n
+---
+1 20 123456
+2 19 987654
+3 22 456789
+---
+
+Registros removidos logicamente não são persistidos.
