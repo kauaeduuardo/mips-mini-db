@@ -1,14 +1,16 @@
 .data
     #java -jar Mars4_5.jar sm src/miniDB.asm 
-    # Constantes
+    # ===== Constantes =====
+    .align 2
     MAX_REGISTROS: .word 100
     TAM_REGISTRO: .word 16
     QTD_REGISTROS: .word 0
     
-    # Banco de registros
+    # # ===== Banco de Registros =====
+    .align 2
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
     
-    # Strings do menu
+    # ===== Strings do Menu =====
     menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n0 - Sair\nOpção: "
     msg_cheio: .asciiz "Banco de dados cheio, não é possível adicionar mais registros!\n"
     msg_invalido: .asciiz "Opção inválida!\n"
@@ -24,6 +26,12 @@
     msg_remover_sucesso: .asciiz "Registro removido com sucesso!\n"
     msg_remover_nao_encontrado: .asciiz "ID não encontrado.\n"
     msg_remover_ja_inativo: .asciiz "Registro já está inativo.\n"
+    
+    # ===== Persistência =====
+    arquivo_nome: .asciiz "banco.txt"
+    buffer:       .space 64
+    espaco:       .asciiz " "
+    newline:      .asciiz "\n"
 
 .text
 .globl main
@@ -51,7 +59,7 @@ loop_menu:
     beq $t0, 2, chamar_listar
     beq $t0, 3, chamar_busca
     beq $t0, 4, chamar_remocao
-    beq $t0, 0, sair
+    beq $t0, 0, sair_com_salvamento
         
     #li $v0, 4
     #la $a0, msg_invalido
@@ -78,28 +86,38 @@ chamar_remocao:
 # ===== Inserção =====
 inserir:
     addi $sp, $sp, -4
-    sw $ra, 0($sp)
-    
-    beq $s1, $s2, banco_cheio # verifica se qtd == max
-    
-    mul  $t0, $s1, $s3     # índice * TAM_REGISTRO
-    add  $t0, $t0, $s0    # base + deslocamento
-    
-    jal ler_dados
+    sw   $ra, 0($sp)
+
+    bne  $s1, $s2, inserir_continua   # se qtd != max, continua
+
+    # banco cheio: exibe mensagem, restaura stack e retorna
+    li   $v0, 4
+    la   $a0, msg_cheio
+    syscall
+    lw   $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr   $ra                          
+
+inserir_continua:
+    mul  $t0, $s1, $s3
+    add  $t0, $t0, $s0
+
+    jal  ler_dados
     move $a0, $s1
     addi $a0, $a0, 1
-    
-    sw $a0, 0($t0) # ID
-    sw $a1, 4($t0) # IDADE
-    sw $a2, 8($t0) # MATRÍCULA
-    li $t1, 1
-    sw $t1, 12($t0) # ATIVO = 1
-    
+
+    sw   $a0, 0($t0)
+    sw   $a1, 4($t0)
+    sw   $a2, 8($t0)
+    li   $t1, 1
+    sw   $t1, 12($t0)
+
     addi $s1, $s1, 1
-    
-    lw $ra, 0($sp)
+    sw   $s1, QTD_REGISTROS
+
+    lw   $ra, 0($sp)
     addi $sp, $sp, 4
-    jr $ra 
+    jr   $ra
     
 ler_dados:
     li $v0, 4
@@ -171,13 +189,6 @@ listar:
         j loop_listar   
     fim_listagem:
         jr $ra
-
-banco_cheio:
-	li $v0, 4
-	la $a0, msg_cheio
-	syscall 
-	
-	j loop_menu
 
 # ===== Busca =====
 buscar_registro:
@@ -331,7 +342,201 @@ remover_registro:
     remover_fim:
         jr $ra    # Retorna para chamar_remocao
 
-# ===== Encerramento =====
-sair:
-    li $v0, 10  
+# ===== Salvar em .txt ===== 
+salvar_banco:
+    addi $sp, $sp, -32
+    sw   $ra,  28($sp)
+    sw   $s5,  24($sp)
+    sw   $s4,  20($sp)
+    sw   $s3,  16($sp)
+    sw   $s1,  12($sp)
+    sw   $s0,   8($sp)
+    sw   $t1,   4($sp)
+    sw   $t0,   0($sp)
+
+    li   $v0, 13
+    la   $a0, arquivo_nome
+    li   $a1, 1
+    li   $a2, 0
     syscall
+
+    move $s5, $v0
+    bltz $s5, salvar_fim
+
+    li   $t0, 0
+
+salvar_loop:
+    beq  $t0, $s1, fechar_arquivo
+
+    mul  $t1, $t0, $s3
+    add  $t1, $t1, $s0
+
+    lw   $t2, 12($t1)
+    beq  $t2, $zero, salvar_proximo
+
+    # ===== ID =====
+    lw   $a0, 0($t1)
+    la   $a1, buffer
+    sw   $t0, 0($sp)
+    sw   $t1, 4($sp)
+    jal  int_to_str
+    lw   $t1, 4($sp)
+    lw   $t0, 0($sp)
+    move $s4, $v0
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, buffer
+    move $a2, $s4
+    syscall
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, espaco
+    li   $a2, 1
+    syscall
+
+    # ===== IDADE =====
+    lw   $a0, 4($t1)
+    la   $a1, buffer
+    sw   $t0, 0($sp)
+    sw   $t1, 4($sp)
+    jal  int_to_str
+    lw   $t1, 4($sp)
+    lw   $t0, 0($sp)
+    move $s4, $v0
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, buffer
+    move $a2, $s4
+    syscall
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, espaco
+    li   $a2, 1
+    syscall
+
+    # ===== MATRÍCULA =====
+    lw   $a0, 8($t1)
+    la   $a1, buffer
+    sw   $t0, 0($sp)
+    sw   $t1, 4($sp)
+    jal  int_to_str
+    lw   $t1, 4($sp)
+    lw   $t0, 0($sp)
+    move $s4, $v0
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, buffer
+    move $a2, $s4
+    syscall
+
+    li   $v0, 15
+    move $a0, $s5
+    la   $a1, newline
+    li   $a2, 1
+    syscall
+
+salvar_proximo:
+    addi $t0, $t0, 1
+    j salvar_loop
+
+fechar_arquivo:
+    li   $v0, 16
+    move $a0, $s5
+    syscall
+
+salvar_fim:
+    lw   $t0,   0($sp)
+    lw   $t1,   4($sp)
+    lw   $s0,   8($sp)
+    lw   $s1,  12($sp)
+    lw   $s3,  16($sp)
+    lw   $s4,  20($sp)
+    lw   $s5,  24($sp)
+    lw   $ra,  28($sp)
+    addi $sp, $sp, 32   # consistente com o -32 do início
+    jr   $ra
+ 
+# ===== int_to_str =====
+int_to_str:
+    # $a0 = inteiro, $a1 = endereço do buffer
+    # Retorna: $v0 = tamanho da string
+    addiu   $sp, $sp, -24
+    sw      $ra, 20($sp)
+    sw      $s0, 16($sp)
+    sw      $s1, 12($sp)
+    sw      $s2,  8($sp)
+    sw      $s3,  4($sp)
+    sw      $s4,  0($sp)
+
+    move    $s0, $a0        # número
+    move    $s1, $a1        # ponteiro para buffer
+    move    $s2, $a1        # guarda início do buffer
+    li      $s3, 0          # tamanho da string
+    li      $s4, 0          # flag: número negativo?
+
+    beqz $s0, zero_case
+    
+convert_loop:
+    beqz    $s0, reverse
+    li      $t1, 10
+    div     $s0, $t1
+    mfhi    $t2             # resto = dígito
+    mflo    $s0             # quociente
+    addiu   $t2, $t2, '0'  # converte para ASCII
+    sb      $t2, 0($s1)
+    addiu   $s1, $s1, 1
+    addiu   $s3, $s3, 1
+    j       convert_loop
+
+    # Os dígitos foram escritos em ordem inversa, precisamos inverter
+reverse:
+    # $s2 = início dos dígitos, $s1-1 = fim dos dígitos
+    addiu   $t0, $s1, -1    # ponteiro para o último dígito
+    move    $t1, $s2        # ponteiro para o primeiro dígito
+
+reverse_loop:
+    bge     $t1, $t0, end_null
+    lb      $t2, 0($t1)
+    lb      $t3, 0($t0)
+    sb      $t3, 0($t1)
+    sb      $t2, 0($t0)
+    addiu   $t1, $t1, 1
+    addiu   $t0, $t0, -1
+    j       reverse_loop
+
+zero_case:
+    li $t2, '0'
+    sb $t2, 0($s1)
+    addiu $s1, $s1, 1
+    li $s3, 1
+    j end_null
+
+end_null:
+    sb      $zero, 0($s1)   # null terminator
+
+    # Calcula tamanho total (inclui '-' se negativo)
+    addu    $v0, $s3, $s4   # tamanho dos dígitos + flag negativo
+
+    lw      $ra, 20($sp)
+    lw      $s0, 16($sp)
+    lw      $s1, 12($sp)
+    lw      $s2,  8($sp)
+    lw      $s3,  4($sp)
+    lw      $s4,  0($sp)
+    addiu   $sp, $sp, 24
+
+    jr      $ra
+        
+# ===== Encerramento =====
+sair_com_salvamento:
+    jal salvar_banco
+    j sair
+
+sair:
+    li $v0, 10
+    syscall 
