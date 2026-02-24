@@ -13,7 +13,7 @@
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
     
     # ===== Strings do Menu =====
-    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n5 - Restaurar dados anteriores\n0 - Sair\nOpção: "
+    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n0 - Sair\nOpção: "
     msg_cheio: .asciiz "Banco de dados cheio, não é possível adicionar mais registros!\n"
     msg_invalido: .asciiz "Opção inválida!\n"
 
