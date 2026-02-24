@@ -13,7 +13,7 @@
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
     
     # ===== Strings do Menu =====
-    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n0 - Sair\nOpção: "
+    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n5 - Restaurar dados anteriores\n0 - Sair\nOpção: "
     msg_cheio: .asciiz "Banco de dados cheio, não é possível adicionar mais registros!\n"
     msg_invalido: .asciiz "Opção inválida!\n"
 
@@ -29,11 +29,18 @@
     msg_remover_nao_encontrado: .asciiz "ID não encontrado.\n"
     msg_remover_ja_inativo: .asciiz "Registro já está inativo.\n"
     
+    msg_carregamento: .asciiz "Carregando dados...\n"
+    msg_dados_carregados: .asciiz "Dados anteriores encontrados e carregados com sucesso!\n"
+    msg_banco_vazio: .asciiz "O banco está vazio!\n"
+    
     # ===== Persistência =====
     arquivo_nome: .asciiz "backup-banco/banco_de_registros.txt"
-    buffer:       .space 64
-    espaco:       .asciiz " "
-    newline:      .asciiz "\n"
+    buffer: .space 64
+    espaco: .asciiz " "
+    newline: .asciiz "\n"
+    
+    linha: .space 64 # Usada para armazenar uma linha do banco
+    
 
 .text
 .globl main
@@ -44,6 +51,8 @@ main:
     lw $s1, QTD_REGISTROS	# QTD_REGISTROS = 0
     lw $s2, MAX_REGISTROS	# MAX_REGISTROS = 100
     lw $s3, TAM_REGISTRO # TAM_REGISTRO
+   
+    jal carregar_banco  
    
 # ===== Menu ===== 
 loop_menu:
@@ -533,6 +542,144 @@ end_null:
     addiu   $sp, $sp, 24
 
     jr      $ra
+
+# ===== Carregar banco =====
+carregar_banco:
+    li $v0, 4
+    la $a0, msg_carregamento
+    syscall 
+    
+    addi $sp, $sp, -4
+    sw   $ra, 0($sp)
+
+    li   $s1, 0                 # zera contador de registros
+
+    # abrir arquivo (read-only)
+    li   $v0, 13
+    la   $a0, arquivo_nome
+    li   $a1, 0
+    li   $a2, 0
+    syscall
+
+    move $t7, $v0               # fd
+    bltz $t7, carregar_fim      # se erro, sai
+
+ler_linha:
+    la   $t8, linha          # ponteiro de escrita no buffer
+    li   $t9, 0              # contador de bytes da linha
+
+ler_char:
+    li   $v0, 14
+    move $a0, $t7
+    move $a1, $t8            # lê 1 byte direto na posição atual
+    li   $a2, 1
+    syscall
+
+    blez $v0, fechar_arquivo_carregamento   # EOF ou erro
+
+    lb   $t6, 0($t8)
+
+    beq  $t6, '\n', linha_completa          # achou fim de linha
+
+    addi $t8, $t8, 1                        # avança ponteiro
+    addi $t9, $t9, 1
+    j    ler_char
+
+linha_completa:
+    beqz $t9, ler_linha                     # linha vazia, ignora
+
+    sb   $zero, 0($t8)                      # null terminator no lugar do \n
+
+    la   $a0, linha
+    jal  parse_linha
+
+    j    ler_linha
+
+fechar_arquivo_carregamento:
+    li   $v0, 16
+    move $a0, $t7
+    syscall
+
+    sw   $s1, QTD_REGISTROS
+
+    beq  $s1, $zero, banco_vazio_msg
+
+    li   $v0, 4
+    la   $a0, msg_dados_carregados
+    syscall
+    j carregar_fim
+
+banco_vazio_msg:
+    li   $v0, 4
+    la   $a0, msg_banco_vazio
+    syscall
+
+carregar_fim:
+    lw   $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr   $ra
+
+# ===== Parse Linha =====
+parse_linha:
+    addi $sp, $sp, -4
+    sw   $ra, 0($sp)
+
+    move $t0, $a0               # ponteiro da linha
+
+    # ID
+    move $a0, $t0
+    jal  str_to_int
+    move $t1, $v0               # ID
+    move $t0, $v1               # próximo campo
+
+    # IDADE
+    move $a0, $t0
+    jal  str_to_int
+    move $t2, $v0               # IDADE
+    move $t0, $v1
+
+    # MATRÍCULA
+    move $a0, $t0
+    jal  str_to_int
+    move $t3, $v0               # MATRÍCULA
+
+    # endereço do registro
+    mul  $t4, $s1, $s3
+    add  $t4, $t4, $s0
+
+    sw   $t1, 0($t4)
+    sw   $t2, 4($t4)
+    sw   $t3, 8($t4)
+    li   $t5, 1
+    sw   $t5, 12($t4)           # ATIVO = 1
+
+    addi $s1, $s1, 1            # incrementa contador
+
+    lw   $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr   $ra
+
+# ===== str_to_int =====
+str_to_int:
+    li   $v0, 0                 # acumulador
+
+loop_str_to_int:
+    lb   $t0, 0($a0)
+    beq  $t0, ' ', fim_str
+    beq  $t0, '\n', fim_str
+    beq  $t0, 0, fim_str
+
+    addi $t0, $t0, -48          # ASCII → número
+    mul  $v0, $v0, 10
+    add  $v0, $v0, $t0
+
+    addi $a0, $a0, 1
+    j loop_str_to_int
+
+fim_str:
+    addi $a0, $a0, 1            # pula separador
+    move $v1, $a0               # retorna novo ponteiro
+    jr   $ra        
         
 # ===== Encerramento =====
 sair_com_salvamento:
