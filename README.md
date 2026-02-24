@@ -48,7 +48,7 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 
 ## Como Executar o Programa
 Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:  
-utilizando o simulador **MARS** ou via **linha de comando** (terminal).
+Utilizando o simulador **MARS** ou via **linha de comando** (terminal).
 
 **Pré-requisitos:**
 - Java instalado no sistema
