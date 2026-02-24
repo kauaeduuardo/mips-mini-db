@@ -55,6 +55,8 @@ utilizando o simulador **MARS** ou via **linha de comando** (terminal).
 - Arquivo `Mars4_5.jar` disponível no projeto ou acessível via sistema
 - Diretório `backup-banco/` existente e arquivo `banco_de_registros.txt` previamente criado
 
+**Observação:** A estrutura de diretórios do projeto é considerada um requisito do sistema. Alterações podem impedir o correto funcionamento da persistência dos dados.
+
 ### 1. Execução pelo MARS
 1. Abra o simulador **Mars**
 2. No menu, clique em **File → Open** e selecione o arquivo principal do projeto:
