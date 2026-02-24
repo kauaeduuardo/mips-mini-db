@@ -11,7 +11,7 @@ O foco do trabalho está na compreensão do funcionamento de baixo nível do com
 
 ## Objetivo do Projeto
 Implementar um mini banco de dados em memória principal, capaz de inserir, listar, buscar e remover registros simples, utilizando exclusivamente Assembly MIPS.
-Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura subjacente.
+Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura.
 
 ## Estrutura de um Registro
 
