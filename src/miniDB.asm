@@ -1,5 +1,7 @@
 .data
+    # ===== Executar por linha de comando =====
     #java -jar Mars4_5.jar sm src/miniDB.asm 
+    
     # ===== Constantes =====
     .align 2
     MAX_REGISTROS: .word 100
@@ -28,7 +30,7 @@
     msg_remover_ja_inativo: .asciiz "Registro já está inativo.\n"
     
     # ===== Persistência =====
-    arquivo_nome: .asciiz "banco_de_registros.txt"
+    arquivo_nome: .asciiz "backup-banco/banco_de_registros.txt"
     buffer:       .space 64
     espaco:       .asciiz " "
     newline:      .asciiz "\n"
