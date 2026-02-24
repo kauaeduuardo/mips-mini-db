@@ -50,11 +50,10 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:
 utilizando o simulador **MARS** ou via **linha de comando** (terminal).
 
-**Observação:** O caminho e a existência de `backup-banco/banco_de_registros.txt` não devem ser alterados, pois mudanças podem comprometer a consistência da persistência dos dados.
-
 **Pré-requisitos:**
-- Java instalado
-- Arquivo `Mars4_5.jar` disponível no projeto ou no sistema
+- Java instalado no sistema
+- Arquivo `Mars4_5.jar` disponível no projeto ou acessível via sistema
+- Diretório `backup-banco/` existente e arquivo `banco_de_registros.txt` previamente criado
 
 ### 1. Execução pelo MARS
 1. Abra o simulador **Mars**
