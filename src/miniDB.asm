@@ -8,6 +8,8 @@
     TAM_REGISTRO: .word 16
     QTD_REGISTROS: .word 0
     
+    NEXT_ID: .word 1
+    
     # ===== Banco de Registros =====
     .align 2
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
@@ -119,10 +121,14 @@ inserir_continua:
     add  $t0, $t0, $s0
 
     jal  ler_dados
-    move $a0, $s1
-    addi $a0, $a0, 1
+    #move $a0, $s1
+    #addi $a0, $a0, 1
 
-    sw   $a0, 0($t0)
+    #sw   $a0, 0($t0)
+    lw   $t9, NEXT_ID     # carrega próximo ID disponível
+    sw   $t9, 0($t0)      # grava ID no registro
+    addi $t9, $t9, 1
+    sw   $t9, NEXT_ID     # atualiza NEXT_ID
     sw   $a1, 4($t0)
     sw   $a2, 8($t0)
     li   $t1, 1
@@ -561,7 +567,8 @@ carregar_banco:
     addi $sp, $sp, -4
     sw   $ra, 0($sp)
 
-    li   $s1, 0                 # zera contador de registros
+    li  $t0, 1
+    sw  $t0, NEXT_ID
 
     # abrir arquivo (read-only)
     li   $v0, 13
@@ -629,7 +636,7 @@ carregar_fim:
     jr   $ra
 
 # ===== Parse Linha =====
-parse_linha:
+parse_linha: 
     addi $sp, $sp, -4
     sw   $ra, 0($sp)
 
@@ -640,6 +647,13 @@ parse_linha:
     jal  str_to_int
     move $t1, $v0               # ID
     move $t0, $v1               # próximo campo
+    
+    lw $t6, NEXT_ID       # t6 = NEXT_ID atual
+    blt $t1, $t6, skip_update_next_id
+    addi $t6, $t1, 1
+    sw  $t6, NEXT_ID
+
+    skip_update_next_id:
 
     # IDADE
     move $a0, $t0
