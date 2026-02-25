@@ -13,7 +13,7 @@
     BANCO: .space 1600 # 100 * 16 = 1600 bytes
     
     # ===== Strings do Menu =====
-    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n0 - Sair\nOpção: "
+    menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n5 - Restaurar\n0 - Sair\nOpção: "
     msg_cheio: .asciiz "Banco de dados cheio, não é possível adicionar mais registros!\n"
     msg_invalido: .asciiz "Opção inválida!\n"
 
@@ -29,6 +29,7 @@
     msg_remover_nao_encontrado: .asciiz "ID não encontrado.\n"
     msg_remover_ja_inativo: .asciiz "Registro já está inativo.\n"
     
+    msg_aviso_carregamento: .asciiz "Para a recuperação dos dados, é necessário que o arquivo 'backup-banco/banco_de_registros.txt' exista no diretório do projeto.\n"
     msg_carregamento: .asciiz "Carregando dados...\n"
     msg_dados_carregados: .asciiz "Dados anteriores encontrados e carregados com sucesso!\n"
     msg_banco_vazio: .asciiz "O banco está vazio!\n"
@@ -52,7 +53,6 @@ main:
     lw $s2, MAX_REGISTROS	# MAX_REGISTROS = 100
     lw $s3, TAM_REGISTRO # TAM_REGISTRO
    
-    jal carregar_banco  
    
 # ===== Menu ===== 
 loop_menu:
@@ -70,6 +70,7 @@ loop_menu:
     beq $t0, 2, chamar_listar
     beq $t0, 3, chamar_busca
     beq $t0, 4, chamar_remocao
+    beq $t0, 5, chamar_restauracao
     beq $t0, 0, sair_com_salvamento
         
     #li $v0, 4
@@ -93,6 +94,10 @@ chamar_busca:
 chamar_remocao:
     jal remover_registro
     j loop_menu
+
+chamar_restauracao:
+   jal carregar_banco  
+   j loop_menu
 
 # ===== Inserção =====
 inserir:
@@ -545,6 +550,10 @@ end_null:
 
 # ===== Carregar banco =====
 carregar_banco:
+    li $v0, 4
+    la $a0, msg_aviso_carregamento
+    syscall 
+    	
     li $v0, 4
     la $a0, msg_carregamento
     syscall 
