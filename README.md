@@ -11,7 +11,7 @@ O foco do trabalho está na compreensão do funcionamento de baixo nível do com
 
 ## Objetivo do Projeto
 Implementar um mini banco de dados em memória principal, capaz de inserir, listar, buscar e remover registros simples, utilizando exclusivamente Assembly MIPS.
-Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura subjacente.
+Todo o controle é feito manualmente, sem abstrações de alto nível, reforçando o entendimento da arquitetura.
 
 ## Estrutura de um Registro
 
@@ -47,8 +47,15 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 - `formato_registro.txt`: especificação do formato de persistência dos registros em arquivo texto
 
 ## Como Executar o Programa
-Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:
-utilizando o simulador **MARS** ou via **linha de comando** (terminal).
+Este projeto foi desenvolvido em **Assembly MIPS** e pode ser executado de duas formas:  
+Utilizando o simulador **MARS** ou via **linha de comando** (terminal).
+
+**Pré-requisitos:**
+- Java instalado no sistema
+- Arquivo `Mars4_5.jar` disponível no projeto ou acessível via sistema
+- Diretório `backup-banco/` existente e arquivo `banco_de_registros.txt` previamente criado
+
+**Observação:** A estrutura de diretórios do projeto é considerada um requisito do sistema. Alterações podem impedir o correto funcionamento da persistência dos dados.
 
 ### 1. Execução pelo MARS
 1. Abra o simulador **Mars**
@@ -61,10 +68,6 @@ utilizando o simulador **MARS** ou via **linha de comando** (terminal).
 
 ### 2. Execução pelo Terminal
 Esta alternativa é recomendada quando se deseja evitar limitações da interface gráfica ou automatizar testes.  
-
-**Pré-requisitos:**
-- Java instalado
-- Arquivo `Mars4_5.jar` disponível no projeto ou no sistema
 
 **Comando de execução**
 1. No diretório raiz do projeto, execute:
