@@ -1,8 +1,12 @@
 .data
-    # ===== Executar por linha de comando =====
-    #java -jar Mars4_5.jar sm src/miniDB.asm 
-    
-    # ===== Constantes =====
+    # ============================================================
+    # Execução:
+    #   java -jar Mars4_5.jar sm src/miniDB.asm
+    # ============================================================
+
+    # ============================================================
+    # Constantes globais do sistema
+    # ============================================================
     .align 2
     MAX_REGISTROS: .word 100
     TAM_REGISTRO: .word 16
@@ -10,11 +14,16 @@
     
     NEXT_ID: .word 1
     
-    # ===== Banco de Registros =====
+    # ============================================================
+    # Banco de registros em memória
+    # ============================================================
     .align 2
-    BANCO: .space 1600 # 100 * 16 = 1600 bytes
+    BANCO: .space 1600 # Vetor linear de registros
+                       # MAX_REGISTROS * TAM_REGISTRO
     
-    # ===== Strings do Menu =====
+    # ============================================================
+    # Mensagens da interface (menu e feedback ao usuário)
+    # ============================================================
     menu: .asciiz "\nSistema de Gerenciamento de Registros\nEscolha uma opção \n1 - Inserir\n2 - Listar\n3 - Buscar\n4 - Remover\n0 - Sair\nOpção: "
     msg_cheio: .asciiz "Banco de dados cheio, não é possível adicionar mais registros!\n"
     msg_invalido: .asciiz "Opção inválida!\n"
@@ -35,23 +44,25 @@
     msg_dados_carregados: .asciiz "Dados anteriores encontrados e carregados com sucesso!\n"
     msg_banco_vazio: .asciiz "O banco está vazio!\n"
     
-    # ===== Persistência =====
+    # ============================================================
+    # Persistência em arquivo texto
+    # ============================================================
     arquivo_nome: .asciiz "backup-banco/banco_de_registros.txt"
     buffer: .space 64
     espaco: .asciiz " "
     newline: .asciiz "\n"
     
-    linha: .space 64 # Usada para armazenar uma linha do banco
+    linha: .space 64 
     
 .text
 .globl main
 
 # ===== Inicialização =====
 main:
-    la $s0, BANCO	# base do banco
+    la $s0, BANCO		# base do banco
     lw $s1, QTD_REGISTROS	# QTD_REGISTROS = 0
     lw $s2, MAX_REGISTROS	# MAX_REGISTROS = 100
-    lw $s3, TAM_REGISTRO # TAM_REGISTRO
+    lw $s3, TAM_REGISTRO 	# TAM_REGISTRO
     
     jal carregar_banco  
    
@@ -73,11 +84,6 @@ loop_menu:
     beq $t0, 4, chamar_remocao
     beq $t0, 0, sair_com_salvamento
         
-    #li $v0, 4
-    #la $a0, msg_invalido
-    #syscall
-    #j loop_menu
-
 # Labels para chamar funções e voltar
 chamar_inserir:
     jal inserir
@@ -95,14 +101,33 @@ chamar_remocao:
     jal remover_registro
     j loop_menu
 
-# ===== Inserção =====
+# ------------------------------------------------------------
+# Função: inserir
+# Descrição:
+#   Insere um novo registro ativo no banco em memória.
+#   O ID é gerado automaticamente e é sempre crescente (NEXT_ID).
+#
+# Entradas: Nenhuma (dados são lidos via syscall)
+#
+# Saídas: Nenhuma
+#
+# Efeitos colaterais:
+#   - Escreve um novo registro em BANCO
+#   - Incrementa QTD_REGISTROS
+#   - Incrementa NEXT_ID
+#
+# Pré-condições:
+#   - QTD_REGISTROS < MAX_REGISTROS
+#
+# Pós-condições:
+#   - Registro inserido com ATIVO = 1
+# ------------------------------------------------------------
 inserir:
     addi $sp, $sp, -4
     sw   $ra, 0($sp)
 
-    bne  $s1, $s2, inserir_continua   # se qtd != max, continua
+    bne  $s1, $s2, inserir_continua   
 
-    # banco cheio: exibe mensagem, restaura stack e retorna
     li   $v0, 4
     la   $a0, msg_cheio
     syscall
@@ -115,14 +140,14 @@ inserir_continua:
     add  $t0, $t0, $s0
 
     jal  ler_dados
-    #move $a0, $s1
-    #addi $a0, $a0, 1
-
-    #sw   $a0, 0($t0)
-    lw   $t9, NEXT_ID     # carrega próximo ID disponível
-    sw   $t9, 0($t0)      # grava ID no registro
+   
+    # Geração de ID lógico monotônico (não reutilizável)
+    # NEXT_ID nunca retrocede, mesmo após remoções 
+    lw   $t9, NEXT_ID    
+    sw   $t9, 0($t0)    
     addi $t9, $t9, 1
-    sw   $t9, NEXT_ID     # atualiza NEXT_ID
+    sw   $t9, NEXT_ID   
+        
     sw   $a1, 4($t0)
     sw   $a2, 8($t0)
     li   $t1, 1
@@ -218,14 +243,14 @@ buscar_registro:
     move $t0, $v0        # $t0 = ID procurado
     
     # Carregar quantidade de registros
-    move $t1, $s1     # $t1 = número total de registros
+    move $t1, $s1     
     
     beq $t1, $zero, busca_nao_encontrado
     
     li $t2, 0            # $t2 = índice atual (contador)
     
     # Carregar endereço base
-    move $t3, $s0  # $t3 = endereço base
+    move $t3, $s0  
     
     busca_loop:
         # Calcular offset: índice * 16
@@ -241,9 +266,9 @@ buscar_registro:
         beq $t6, $t0, busca_encontrado  # se ID igual, encontrou
         
     busca_proximo:
-        addi $t2, $t2, 1      # incrementa contador
-        blt $t2, $t1, busca_loop  # se contador < qtd_registros, continua
-        j busca_nao_encontrado  # se terminou o loop sem encontrar
+        addi $t2, $t2, 1     
+        blt $t2, $t1, busca_loop  
+        j busca_nao_encontrado  
     
     busca_encontrado:
         li $v0, 4
@@ -258,7 +283,7 @@ buscar_registro:
         li $v0, 1
         syscall
         li $v0, 11
-        li $a0, 10            # newline
+        li $a0, 10          
         syscall
         
         # Exibir Idade
@@ -291,29 +316,39 @@ buscar_registro:
         syscall
     
     busca_fim:
-        jr $ra    # Retorna para chamar_busca
+        jr $ra    
 
-# ===== Remoção =====
+# ------------------------------------------------------------
+# Função: remover_registro
+# Descrição: Realiza remoção lógica de um registro, marcando-o como inativo.
+#
+# Entrada: ID fornecido pelo usuário
+#
+# Saídas: Nenhuma
+#
+# Efeitos colaterais:
+#   - Atualiza o campo ATIVO do registro para 0
+#
+# Observações:
+#   - A remoção não compacta o banco
+#   - IDs não são reutilizados
+# ------------------------------------------------------------
 remover_registro:
     # Pedir ID para remoção
     li $v0, 4
     la $a0, msg_remover_id
     syscall
     
-    # Ler ID
     li $v0, 5
     syscall
     move $t0, $v0        # $t0 = ID a remover
     
-    # Carregar quantidade de registros
     move $t1, $s1     # $t1 = número total de registros
     
-    # Se não há registros
     beq $t1, $zero, remover_nao_encontrado
     
     li $t2, 0            # $t2 = índice atual (contador)
     
-    # Carregar endereço base
     move $t3, $s0   # $t3 = endereço base
     
     remover_loop:
@@ -328,15 +363,14 @@ remover_registro:
     remover_proximo:
         addi $t2, $t2, 1      # incrementa contador
         blt $t2, $t1, remover_loop  # se contador < qtd_registros, continua
-        j remover_nao_encontrado  # se terminou o loop sem encontrar
+        j remover_nao_encontrado  
     
     remover_encontrado:
         # Verificar se já está inativo
         lw $t6, 12($t5)       # carrega ATIVO
         beq $t6, 0, remover_ja_inativo
         
-        # Marcar como inativo (ATIVO = 0)
-        sw $zero, 12($t5)
+        sw $zero, 12($t5) # Remoção lógica: registro permanece na memória
         
         # Mensagem de sucesso
         li $v0, 4
@@ -356,9 +390,18 @@ remover_registro:
         syscall
     
     remover_fim:
-        jr $ra    # Retorna para chamar_remocao
+        jr $ra    
 
-# ===== Salvar em .txt ===== 
+# ------------------------------------------------------------
+# Função: salvar_banco
+# Descrição:
+#   Persiste os registros ativos em arquivo texto.
+#
+# Observações:
+#   - Apenas registros ATIVO = 1 são gravados
+#   - Não altera dados em memória
+#   - Falhas de abertura ou escrita impedem a persistência
+# ------------------------------------------------------------
 salvar_banco:
     addi $sp, $sp, -32
     sw   $ra,  28($sp)
@@ -474,7 +517,7 @@ salvar_fim:
     lw   $s4,  20($sp)
     lw   $s5,  24($sp)
     lw   $ra,  28($sp)
-    addi $sp, $sp, 32   # consistente com o -32 do início
+    addi $sp, $sp, 32   
     jr   $ra
  
 # ===== int_to_str =====
@@ -493,7 +536,7 @@ int_to_str:
     move    $s1, $a1        # ponteiro para buffer
     move    $s2, $a1        # guarda início do buffer
     li      $s3, 0          # tamanho da string
-    li      $s4, 0          # flag: número negativo?
+    li      $s4, 0          
 
     beqz $s0, zero_case
     
@@ -503,13 +546,13 @@ convert_loop:
     div     $s0, $t1
     mfhi    $t2             # resto = dígito
     mflo    $s0             # quociente
-    addiu   $t2, $t2, '0'  # converte para ASCII
+    addiu   $t2, $t2, '0'   # converte para ASCII
     sb      $t2, 0($s1)
     addiu   $s1, $s1, 1
     addiu   $s3, $s3, 1
     j       convert_loop
 
-    # Os dígitos foram escritos em ordem inversa, precisamos inverter
+# Os dígitos foram escritos em ordem inversa, precisamos inverter
 reverse:
     # $s2 = início dos dígitos, $s1-1 = fim dos dígitos
     addiu   $t0, $s1, -1    # ponteiro para o último dígito
@@ -535,8 +578,7 @@ zero_case:
 end_null:
     sb      $zero, 0($s1)   # null terminator
 
-    # Calcula tamanho total (inclui '-' se negativo)
-    addu    $v0, $s3, $s4   # tamanho dos dígitos + flag negativo
+    addu    $v0, $s3, $s4   # tamanho dos dígitos
 
     lw      $ra, 20($sp)
     lw      $s0, 16($sp)
@@ -548,7 +590,21 @@ end_null:
 
     jr      $ra
 
-# ===== Carregar banco =====
+# ------------------------------------------------------------
+# Função: carregar_banco
+# Descrição:
+#   Reconstrói o banco de registros em memória a partir do
+#   arquivo de persistência, caso exista.
+#
+# Efeitos colaterais:
+#   - Preenche BANCO com registros ativos
+#   - Atualiza QTD_REGISTROS
+#   - Recalcula NEXT_ID com base no maior ID encontrado
+#
+# Observações:
+#   - A ausência do arquivo é tratada como banco vazio
+#   - O banco não é compactado nem validado estruturalmente
+# ------------------------------------------------------------
 carregar_banco:	
     li $v0, 4
     la $a0, msg_carregamento
@@ -587,14 +643,14 @@ ler_char:
 
     beq  $t6, '\n', linha_completa          # achou fim de linha
 
-    addi $t8, $t8, 1                        # avança ponteiro
+    addi $t8, $t8, 1        # avança ponteiro
     addi $t9, $t9, 1
     j    ler_char
 
 linha_completa:
-    beqz $t9, ler_linha                     # linha vazia, ignora
+    beqz $t9, ler_linha    # linha vazia, ignora
 
-    sb   $zero, 0($t8)                      # null terminator no lugar do \n
+    sb   $zero, 0($t8)     # null terminator no lugar do \n
 
     la   $a0, linha
     jal  parse_linha
@@ -638,7 +694,7 @@ parse_linha:
     move $t1, $v0               # ID
     move $t0, $v1               # próximo campo
     
-    lw $t6, NEXT_ID       # t6 = NEXT_ID atual
+    lw $t6, NEXT_ID       	
     blt $t1, $t6, skip_update_next_id
     addi $t6, $t1, 1
     sw  $t6, NEXT_ID
