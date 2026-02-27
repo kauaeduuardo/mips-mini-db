@@ -84,7 +84,7 @@ loop_menu:
     beq $t0, 4, chamar_remocao
     beq $t0, 0, sair_com_salvamento
         
-# Labels para chamar funções e voltar
+# ===== Labels para chamar funções e voltar =====  
 chamar_inserir:
     jal inserir
     j loop_menu
@@ -106,10 +106,6 @@ chamar_remocao:
 # Descrição:
 #   Insere um novo registro ativo no banco em memória.
 #   O ID é gerado automaticamente e é sempre crescente (NEXT_ID).
-#
-# Entradas: Nenhuma (dados são lidos via syscall)
-#
-# Saídas: Nenhuma
 #
 # Efeitos colaterais:
 #   - Escreve um novo registro em BANCO
