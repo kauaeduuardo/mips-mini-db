@@ -29,8 +29,8 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 ~~~
 /mips-mini-db/
 │
-├── backup-banco/
-│   └── banco_de_registros.txt
+├── backup/
+│   └── banco.txt
 │
 ├── src/
 │   └── miniDB.asm
@@ -42,7 +42,7 @@ O campo `ATIVO` indica se o registro está ativo (`1`) ou removido logicamente (
 └── README.md
 ~~~
 
-- `banco_de_registros.txt`: arquivo necessário para persistência dos dados
+- `banco.txt`: arquivo necessário para persistência dos dados
 - `miniDB.asm`: arquivo principal do projeto
 - `formato_registro.txt`: especificação do formato de persistência dos registros em arquivo texto
 
@@ -53,7 +53,7 @@ Utilizando o simulador **MARS** ou via **linha de comando** (terminal).
 **Pré-requisitos:**
 - Java instalado no sistema
 - Arquivo `Mars4_5.jar` disponível no projeto ou acessível via sistema
-- Diretório `backup-banco/` existente e arquivo `banco_de_registros.txt` previamente criado
+- Diretório `backup/` existente e arquivo `banco.txt` previamente criado
 
 **Observação:** A estrutura de diretórios do projeto é considerada um requisito do sistema. Alterações podem impedir o correto funcionamento da persistência dos dados.
 
