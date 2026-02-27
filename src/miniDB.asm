@@ -47,7 +47,7 @@
     # ============================================================
     # Persistência em arquivo texto
     # ============================================================
-    arquivo_nome: .asciiz "backup-banco/banco_de_registros.txt"
+    arquivo_nome: .asciiz "backup/banco.txt"
     buffer: .space 64
     espaco: .asciiz " "
     newline: .asciiz "\n"
@@ -106,6 +106,10 @@ chamar_remocao:
 # Descrição:
 #   Insere um novo registro ativo no banco em memória.
 #   O ID é gerado automaticamente e é sempre crescente (NEXT_ID).
+#
+# Entradas: Nenhuma (dados são lidos via syscall)
+#
+# Saídas: Nenhuma
 #
 # Efeitos colaterais:
 #   - Escreve um novo registro em BANCO
