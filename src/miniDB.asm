@@ -83,6 +83,11 @@ loop_menu:
     beq $t0, 3, chamar_busca
     beq $t0, 4, chamar_remocao
     beq $t0, 0, sair_com_salvamento
+    
+    li $v0, 4
+    la $a0, msg_invalido
+    syscall
+    j loop_menu
         
 # ===== Labels para chamar funções e voltar =====  
 chamar_inserir:
