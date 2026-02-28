@@ -33,7 +33,7 @@
     msg_busca_nao_encontrado: .asciiz "Registro não encontrado ou inativo.\n"
     msg_id: .asciiz "\nID: "
     msg_idade: .asciiz "Idade: "
-    msg_matricula: .asciiz "Matrícula: "
+    msg_matricula: .asciiz "Matrícula [8 digitos numéricos]: "
 
     msg_remover_id: .asciiz "Digite o ID para remover: "
     msg_remover_sucesso: .asciiz "Registro removido com sucesso!\n"
